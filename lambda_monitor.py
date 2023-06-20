@@ -30,7 +30,7 @@ def lambda_handler(event, context):
         writer.writerow(csv_data)
     
     #add row for total code size
-    csv_data = ['Total', 'None', totalsize]
+    csv_data = ['Total', 'Total', totalsize]
     writer.writerow(csv_data)
     
      # Save the CSV file to S3
@@ -40,5 +40,14 @@ def lambda_handler(event, context):
     
     #insert the CSV file into the S3 bucket
     s3.Object(bucket_name, file_name).put(Body=csv_buffer.getvalue())
+    
+    #Check if the total code size exceeds 90% of 75GB
+    if totalsize >= 72477573120:
+        sns = boto3.client('sns')
+        sns.publish(
+            TopicArn='arn:aws:sns:eu-north-1:248997530403:LambdaCapacityAlert',
+            Message='Lambda Code Size has reached 90% capacity!',
+            Subject='Capacity Alert!'
+        )
 
     return {'statusCode' : 200, 'LambdaStats' : 'success'}
