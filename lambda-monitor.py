@@ -12,6 +12,10 @@ def lambda_handler(event, context):
     csv_buffer = StringIO()
     writer = csv.writer(csv_buffer)
     
+    #add headers
+    csv_data = ['Name', 'Version', 'Size']
+    writer.writerow(csv_data)
+    
     #Get a list of all Lambda functions and all versions
     lambdalist = lambdas.list_functions(FunctionVersion='ALL', MaxItems=9999)
     
